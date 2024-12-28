@@ -32,7 +32,7 @@ This is a C++ trading engine that uses FYERS cURL APIs to automate trading. The 
    - Paste your API key, secret key, and other login credentials in `credentials.h`.
 
 3. **Refresh Token Management**:
-   - The `data/refresh_token.txt` file stores the refresh token, which is used to generate the access token.
+   - The `refresh_token.txt` file stores the refresh token, which is used to generate the access token.
    - The refresh token expires every 15 days. When it expires, follow these steps:
      - Delete the `refresh_token.txt` file.
      - Generate a fresh auth code manually from the FYERS portal.
