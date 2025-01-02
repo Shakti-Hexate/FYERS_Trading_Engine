@@ -19,17 +19,14 @@ OrdersResponse getOrders(const std::string& auth_header) {
         throw std::runtime_error("Failed to initialize CURL");
     }
 
-    // Prepare headers
     struct curl_slist* headers = nullptr;
     headers = curl_slist_append(headers, authHeader.c_str());
 
-    // Set CURL options
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
-    // Perform the CURL request
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
         curl_slist_free_all(headers);
@@ -37,11 +34,9 @@ OrdersResponse getOrders(const std::string& auth_header) {
         throw std::runtime_error("CURL request failed: " + std::string(curl_easy_strerror(res)));
     }
 
-    // Clean up
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
 
-    // Parse the response
     simdjson::dom::parser parser;
     simdjson::dom::element doc;
     auto error = parser.parse(response).get(doc);
@@ -49,7 +44,6 @@ OrdersResponse getOrders(const std::string& auth_header) {
         throw std::runtime_error("Failed to parse JSON response: " + std::string(simdjson::error_message(error)));
     }
 
-    // Check response status
     int64_t code;
     std::string_view status;
     if (doc["code"].get_int64().get(code) || doc["s"].get_string().get(status) || code != 200 || status != "ok") {
@@ -58,7 +52,6 @@ OrdersResponse getOrders(const std::string& auth_header) {
 
     OrdersResponse ordersResponse;
 
-    // Extract orders
     simdjson::dom::array orderBookArray;
     if (doc["orderBook"].get_array().get(orderBookArray)) {
         throw std::runtime_error("Failed to extract 'orderBook' array from response.");
@@ -67,7 +60,6 @@ OrdersResponse getOrders(const std::string& auth_header) {
     for (auto orderElement : orderBookArray) {
         Order order;
 
-        // Extract fields with explicit error handling
         auto clientIdRes = orderElement["clientId"].get_string();
         order.clientId = clientIdRes.error() ? "" : std::string(clientIdRes.value());
 
