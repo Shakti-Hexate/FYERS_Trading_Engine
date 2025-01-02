@@ -1,4 +1,0 @@
-C:\dev\FYERS_Trading_engine\bin\x64\Debug\libcrypto-3-x64.dll
-C:\dev\FYERS_Trading_engine\bin\x64\Debug\libcurl-d.dll
-C:\dev\FYERS_Trading_engine\bin\x64\Debug\zlibd1.dll
-C:\dev\FYERS_Trading_engine\bin\intermediates\x64\Debug\FYERS_Tr.F6116177.Up2Date
