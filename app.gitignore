@@ -1,0 +1,26 @@
+# Build files
+*.obj
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.iobj
+*.ipdb
+
+# VS specific folders
+.vs/
+*.VC.db
+
+# Build directories
+Debug/
+Release/
+x64/
+x86/
+
+# User-specific files
+*.suo
+*.user
+*.log
+*.tlog
+*.lastbuildstate
