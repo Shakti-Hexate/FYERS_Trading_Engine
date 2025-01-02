@@ -10,13 +10,11 @@ bool placeOrder(const std::string& auth_header, const PlaceOrder& order, std::st
         return false;
     }
 
-    // URL and headers
     std::string url = "https://api-t1.fyers.in/api/v3/orders/sync";
     struct curl_slist* headers = nullptr;
     headers = curl_slist_append(headers, ("Authorization: " + auth_header).c_str());
     headers = curl_slist_append(headers, "Content-Type: application/json");
 
-    // JSON payload
     std::string payload = R"({
         "symbol":")" + order.symbol + R"(",
         "qty":)" + std::to_string(order.qty) + R"(,
@@ -33,15 +31,12 @@ bool placeOrder(const std::string& auth_header, const PlaceOrder& order, std::st
         "orderTag":")" + order.orderTag + R"("
     })";
 
-    // Log payload
     std::cout << "Payload: " << payload << std::endl;
 
-    // CURL options
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, payload.c_str());
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-    // Response handling
     std::string response;
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, [](void* data, size_t size, size_t nmemb, void* userp) -> size_t {
         ((std::string*)userp)->append((char*)data, size * nmemb);
@@ -49,7 +44,6 @@ bool placeOrder(const std::string& auth_header, const PlaceOrder& order, std::st
         });
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
-    // Perform the request
     CURLcode res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
         std::cerr << "CURL request failed: " << curl_easy_strerror(res) << std::endl;
@@ -58,7 +52,6 @@ bool placeOrder(const std::string& auth_header, const PlaceOrder& order, std::st
         return false;
     }
 
-    // Log raw response
     if (response.empty()) {
         std::cerr << "Empty response from server. Please check the API endpoint and access token." << std::endl;
         curl_slist_free_all(headers);
@@ -67,23 +60,19 @@ bool placeOrder(const std::string& auth_header, const PlaceOrder& order, std::st
     }
     std::cout << "Raw Response: " << response << std::endl;
 
-    // Cleanup
     curl_slist_free_all(headers);
     curl_easy_cleanup(curl);
 
-    // Parse the JSON response
     try {
         simdjson::dom::parser parser;
         simdjson::dom::element doc = parser.parse(response);
 
-        // Check for success
         std::string status = std::string(doc["s"]);
         if (status != "ok") {
             std::cerr << "Error placing order: " << std::string(doc["message"]) << std::endl;
             return false;
         }
 
-        // Extract the order reference number
         orderRefNo = std::string(doc["id"]);
         std::cout << "Order placed successfully. Order Ref No: " << orderRefNo << std::endl;
         return true;
